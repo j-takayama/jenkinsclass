@@ -1,0 +1,22 @@
+# Use the official Jenkins LTS image as base
+FROM jenkins/jenkins:lts-jdk17
+
+# Switch to root to install extra packages (optional)
+USER root
+
+# Install any tools you want available in Jenkins (example: git, docker-cli)
+RUN apt-get update && \
+    apt-get install -y git curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a volume for Jenkins home (persistent config and jobs)
+VOLUME /var/jenkins_home
+
+# Expose Jenkins web UI and agent ports
+EXPOSE 8080 50000
+
+# Drop back to the jenkins user for runtime
+USER jenkins
+
+# Jenkins entrypoint is already defined in the base image
+# So we just inherit it; no CMD or ENTRYPOINT needed.
