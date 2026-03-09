@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Format Check') {
             steps {
-                sh 'cargo fmt --all -- --check'
+                cargo fmt --all -- --check
             }
         }
 
