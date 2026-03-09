@@ -58,6 +58,7 @@ pipeline {
                 branch 'main'
             }
             steps {
+                sh 'touch release_deploy_marker.txt'
                 sh 'echo deployed'
             }
         }
