@@ -54,10 +54,7 @@ pipeline {
         }
 
         stage('Deployment') {
-            when {
-                branch 'main'
-            }
-            steps {
+               steps {
                 sh 'touch release_deploy_marker.txt'
                 sh 'echo deployed'
             }
