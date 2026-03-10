@@ -4,7 +4,7 @@ use fortune::parse_name_from_args;
 fn parse_name_defaults_to_you_when_no_args_are_present() {
     let name = parse_name_from_args(std::iter::empty::<&str>());
 
-    assert_eq!(name, "me");
+    assert_eq!(name, "you");
 }
 
 #[test]
