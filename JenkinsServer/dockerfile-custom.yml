@@ -3,7 +3,7 @@ services:
   jenkins:
     build:
       context: .
-      dockerfile: my-jenkins     # your custom controller image 
+      dockerfile: my_jenkins     # your custom controller image 
     container_name: jenkins
     group_add:
       - "998" # Add jenkins user to docker group (GID 999) for Docker socket access

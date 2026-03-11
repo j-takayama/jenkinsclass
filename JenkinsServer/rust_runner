@@ -1,9 +1,29 @@
+# -----------------------------------------------------------------------------
+# File: JenkinsServer/rust_runner
+# Purpose: Build a Jenkins inbound agent image with:
+# - Corporate root CA trust configured for OS + Java
+# - Rust toolchain and C build dependencies for compiling Rust crates
+# - Clippy and rustfmt for CI linting and formatting gates
+#
+# Build context requirement:
+# - `MITRE_BA_ROOT.crt` must be present in the same build context directory.
+#
+# Typical usage:
+# - Build: docker build -f JenkinsServer/rust_runner -t rust-runner .
+# - Run:   Launched automatically by Jenkins as an inbound agent node.
+# -----------------------------------------------------------------------------
+
+# Use the official Jenkins inbound agent as the base.
 FROM jenkins/inbound-agent:latest
 
+# Switch to root for package installation and system-level certificate updates.
 USER root
+
+# Add the corporate root certificate to the Linux trust store location.
 COPY MITRE_BA_ROOT.crt /usr/local/share/ca-certificates/corp-root-ca.crt
 
-# Install ca-certificates and import the custom CA certificate into the Java keystore
+# Install required packages, refresh the OS trust store, and import the certificate
+# into the JVM cacerts keystore so Java-based tooling trusts internal TLS endpoints.
 RUN apt-get update && apt-get install -y ca-certificates openssl \
  && update-ca-certificates \
  && keytool -importcert -noprompt -trustcacerts \
@@ -12,7 +32,7 @@ RUN apt-get update && apt-get install -y ca-certificates openssl \
       -keystore "$JAVA_HOME/lib/security/cacerts" \
       -storepass changeit
 
-# Install Rust and build tools
+# Install the Rust toolchain and native build dependencies required by Cargo crates.
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
@@ -21,9 +41,12 @@ RUN apt-get update && apt-get install -y \
     git \
     cargo
 
+# Install Clippy and rustfmt for linting and formatting checks in the pipeline.
 RUN apt-get install -y rust-clippy rustfmt
 
+# Keep image size smaller by cleaning apt metadata.
 RUN rm -rf /var/lib/apt/lists/*
 
+# Run agent as non-root for normal operation.
 USER jenkins
 

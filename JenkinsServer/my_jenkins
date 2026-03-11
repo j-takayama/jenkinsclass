@@ -33,18 +33,6 @@ RUN apt-get update && apt-get install -y ca-certificates openssl  curl git\
       -keystore "$JAVA_HOME/lib/security/cacerts" \
       -storepass changeit
 
-# Install Rust and build tools
-RUN apt-get update && apt-get install -y \
-    curl \
-    build-essential \
-    pkg-config \
-    libssl-dev \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
-
 # Ensure the `jenkins` user can access the Docker socket when mounted from host.
 RUN groupadd -f docker && usermod -aG docker jenkins
 
