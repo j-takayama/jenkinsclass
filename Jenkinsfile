@@ -22,6 +22,8 @@ pipeline {
                     if ! command -v cargo >/dev/null 2>&1; then
                         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
                     fi
+                    . /var/jenkins_home/.cargo/env
+                    rustup default stable
                     rustup component add rustfmt clippy
                     cargo --version
                     rustc --version
@@ -31,25 +33,37 @@ pipeline {
 
         stage('Format Check') {
             steps {
-                sh 'cargo fmt --all -- --check'
+                sh '''
+                   . /var/jenkins_home/.cargo/env
+                   cargo fmt --all -- --check
+                '''
             }
         }
 
         stage('Clippy') {
             steps {
-                sh 'cargo clippy --all-targets --all-features -- -D warnings -W clippy::pedantic'
+                sh '''
+                   . /var/jenkins_home/.cargo/env
+                   cargo clippy --all-targets --all-features -- -D warnings -W clippy::pedantic
+                '''
             }
         }
 
         stage('Test') {
             steps {
-                sh 'cargo test --all-features'
+                sh '''
+                   . /var/jenkins_home/.cargo/env
+                   cargo test --all-features
+                '''
             }
         }
 
         stage('Release Build') {
             steps {
-                sh 'cargo build --release --all-targets'
+                sh '''
+                   . /var/jenkins_home/.cargo/env
+                   cargo build --release --all-targets
+                '''
             }
         }
 
