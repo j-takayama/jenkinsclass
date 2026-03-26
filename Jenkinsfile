@@ -33,7 +33,10 @@ pipeline {
 
         stage('Format Check') {
             steps {
-                sh 'cargo fmt --all -- --check'
+                sh '''
+                   . /var/jenkins_home/.cargo/env
+                   cargo fmt --all -- --check
+                '''
             }
         }
 
